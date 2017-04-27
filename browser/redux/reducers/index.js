@@ -1,7 +1,7 @@
 import {combineReducers} from 'redux'
 
 const rootReducer = combineReducers({
-  //xxx: require('./xxx')
+  canvas: require('./canvas').default
 })
 
 export default rootReducer
