@@ -8,8 +8,9 @@ const main = function () {
     Graphics = PIXI.Graphics,
     Text = PIXI.Text,
     Matrix = PIXI.Matrix,
-    b = new Bump(PIXI)
-  
+    b = new Bump(PIXI),
+    socket = io(window.location.origin)
+
   let stage = new Container()
   const renderer = autoDetectRenderer(1024, 512, {antialias: false, transparent: false, resolution: 1})
 
@@ -80,14 +81,14 @@ const main = function () {
     // stage.addChild(circle)
 
     stage.addChild(red)
-    red.position.set(20, floor)
+    red.position.set(80, floor)
     red.vx = 0
     red.vy = 0
 
     blue = assembleAltFencer(0x0000FF)
     blueSword = blue.children[1]
     stage.addChild(blue)
-    blue.position.set(800, floor)
+    blue.position.set(900, floor)
     blue.vx = 0
     blue.vy = 0
 
@@ -261,7 +262,7 @@ const main = function () {
     // console.log(count)
     count--
     if (count <= 0) {
-      red.position.set(20, floor)
+      red.position.set(80, floor)
       blue.position.set(900, floor)
       touch.visible = false
       state = play
@@ -346,6 +347,8 @@ const main = function () {
   enter.press = function() {
     console.log('current stage', stage)
   }
+
+  //sockets yay
 
   return {}
 }()
