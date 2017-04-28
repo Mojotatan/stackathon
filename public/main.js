@@ -7,6 +7,7 @@ const main = function () {
     Sprite = PIXI.Sprite,
     Graphics = PIXI.Graphics,
     Text = PIXI.Text,
+    Matrix = PIXI.Matrix,
     b = new Bump(PIXI)
   
   let stage = new Container()
@@ -31,11 +32,6 @@ const main = function () {
   function setup() {
     console.log('All files loaded')
 
-    // let backdrop = new Graphics()
-    // backdrop.beginFill(0x606060)
-    // backdrop.drawRect(0, 0, 1024, 512)
-    // backdrop.endFill()
-    // stage.addChild(backdrop)
     let backdrop = new Sprite(resources["sprites/fullstack.png"].texture)
     stage.addChild(backdrop)
     backdrop.position.set(0, -100)
@@ -68,7 +64,7 @@ const main = function () {
       "Blue",
       {fontFamily: "Arial", fontSize: 32, fill: "blue"}
     )
-    blueName.position.set(870, 0)
+    blueName.position.set(834, 0)
     stage.addChild(blueName)
 
     red = assemblePlayer(0xFF0000, 1)
@@ -80,26 +76,16 @@ const main = function () {
     circle.endFill()
     stage.addChild(circle)
 
-    // let hitbox = new Graphics()
-    // hitbox.lineStyle(2, 0x00FF00, 1)
-    // hitbox.drawRect(red.x, red.y, red.width, red.height)
-    // red.addChild(hitbox)
-
     stage.addChild(red)
     red.position.set(20, floor)
     red.vx = 0
     red.vy = 0
-
-    // red.direction = 'right'
-    // red.swing = true
 
     blue = assembleAltFencer(0x0000FF)
     blueSword = blue.children[1]
     stage.addChild(blue)
     blue.position.set(800, floor)
     // blue.scale.x = -1
-    // blue.direction = 'left'
-    // blue.swing = false
 
     console.log(stage)
 
@@ -134,32 +120,24 @@ let count = 0
       red.vy = 0
     }
 
-    if (red.swing) redSword.rotation += .524 * red.vector
-    else if (!red.swing && Math.abs(redSword.rotation) > 0) redSword.rotation -= .524 * red.vector
-    if (Math.abs(redSword.rotation) >= 1.5) red.swing = false
-    // if (check) {
-    //   console.log(redSword)
-    //   console.log(blue.children[1])
-    //   check = false
-    // }
-    // if (b.hit(redSword, blue.children[0].children), false, false, true) console.log('hit')
+    // if (red.swing) redSword.rotation += .524 * red.vector
+    // else if (!red.swing && Math.abs(redSword.rotation) > 0) redSword.rotation -= .524 * red.vector
+    // if (Math.abs(redSword.rotation) >= 1.5) red.swing = false
 
-    // let hitbox = new Graphics()
-    // hitbox.lineStyle(2, 0x00FF00, 1)
-    // hitbox.drawRect(red.x, red.y, red.width, red.height)
-    // stage.addChild(hitbox)
+    if (red.swing) {
+      redSword.children[red.arc].visible = false
+      red.arc++
+      redSword.children[red.arc].visible = true
+      if (red.arc === 3) red.swing = false
+    } else if (!red.swing && red.arc > 1) {
+      redSword.children[red.arc].visible = false
+      red.arc--
+      redSword.children[red.arc].visible = true
+    }
 
-    // count++
-    // if (count < 480) console.log(stage)
-
-    // if (stab(red.children[1].children[2], blue.children[2])) console.log('sword hit')
-    // if (stab(red, blue)) console.log('sword hit2')
-    // console.log(red.width, red.x, '||', blue.width, blue.x)
-
-    // if (b.hit(red, blue, false, false, true)) console.log('body hit')
-
-
-    if (b.hit(red.children[0], blue, false, false, true)) console.log('sword hit')
+    // a note on collision: right now, when both models are facing forward, it works perfectly.
+    // however, when you face backwards, the collision still triggers on your sword swinging "backwards"
+    if (b.hit(redSword.children[red.arc], blue, false, false, true)) console.log('sword hit')
 
     // if (b.hitTestPoint({x: 500, y: 420}, red.children[1])) console.log('test hit')
   }
@@ -200,7 +178,12 @@ let count = 0
 
   let space = keyboard(32)
   space.press = function() {
-    if (!red.swing && red.children[1].rotation === 0) red.swing = true
+    if (!red.swing && red.arc === 1) red.swing = true
+  }
+
+  let enter = keyboard(13)
+  enter.press = function() {
+    console.log('current state', stage)
   }
 
   return {}

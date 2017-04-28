@@ -66,8 +66,31 @@ const assembleSword = function() {
   blade.moveTo(0, 0)
   blade.lineTo(0, -bodyLength)
 
+  //if pythagorean theoreum is a^2 + b^2 = c^2 and a = b
+  //a given c can be used to find a like so
+  function findA (c) {
+    let val = Math.pow(c, 2)
+    val = val / 2
+    return Math.round(Math.sqrt(val))
+  }
+  let blade1 = new Graphics()
+  blade1.lineStyle(2, 0x000000, 1)
+  blade1.moveTo(0, 0)
+  blade1.lineTo(findA(bodyLength), -findA(bodyLength))
+
+  let blade2 = new Graphics()
+  blade2.lineStyle(2, 0x000000, 1)
+  blade2.moveTo(0, 0)
+  blade2.lineTo(bodyLength, 0)
+
+
   sword.addChild(hilt)
   sword.addChild(blade)
+  sword.addChild(blade1)
+  sword.addChild(blade2)
+
+  blade1.visible = false
+  blade2.visible = false
 
   return sword
 
@@ -104,6 +127,7 @@ const assemblePlayer = function(color) {
 
   player.swing = false
   player.vector = 1
+  player.arc = 1
 
   return player
 }
