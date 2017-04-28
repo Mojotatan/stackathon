@@ -25,7 +25,7 @@ const main = function () {
     console.log(`loading ${resource.url}`)
   }
 
-  let state, red, redSword, blue, blueSword, touch, redScore, blueScore, count, gg, redName, blueName
+  let state, red, redSword, blue, blueSword, touch, redScore, blueScore, count, gg, redName, blueName, iAm
 
   const playerHeight = 108
   const floor = 512 - playerHeight
@@ -281,66 +281,90 @@ const main = function () {
 
   let left = keyboard(65)
   left.press = function() {
-    red.vx -= 10
-    if (red.scale.x === 1 * red.vector) {
-      // red.scale.x = -1 * red.vector
-      // red.x += 46 * red.vector
-      red.turn = -1
+    if (iAm === 'red') {
+      red.vx -= 10
+      if (red.scale.x === 1 * red.vector) {
+        // red.scale.x = -1 * red.vector
+        // red.x += 46 * red.vector
+        red.turn = -1
+      }
     }
   }
   left.release = function() {
-    red.vx += 10
+    if (iAm === 'red') {
+      red.vx += 10
+    }
   }
   let bleft = keyboard(75)
   bleft.press = function() {
-    blue.vx -= 10
-    if (blue.scale.x === 1 * blue.vector) {
-      blue.turn = -1
+    if (iAm === 'blue') {
+      blue.vx -= 10
+      if (blue.scale.x === 1 * blue.vector) {
+        blue.turn = -1
+      }
     }
   }
   bleft.release = function() {
-    blue.vx += 10
+    if (iAm === 'blue') {
+      blue.vx += 10
+    }
   }
 
   let right = keyboard(68)
   right.press = function() {
-    red.vx += 10
-    if (red.scale.x === -1 * red.vector) {
-      // red.scale.x = 1 * red.vector
-      // red.x -= 46 * red.vector
-      red.turn = 1
+    if (iAm === 'red') {
+      red.vx += 10
+      if (red.scale.x === -1 * red.vector) {
+        // red.scale.x = 1 * red.vector
+        // red.x -= 46 * red.vector
+        red.turn = 1
+      }
     }
   }
   right.release = function() {
-    red.vx -= 10
+    if (iAm === 'red') {
+      red.vx -= 10
+    }
   }
   let bright = keyboard(186)
   bright.press = function() {
-    blue.vx += 10
-    if (blue.scale.x === -1 * blue.vector) {
-      blue.turn = 1
+    if (iAm === 'blue') {
+      blue.vx += 10
+      if (blue.scale.x === -1 * blue.vector) {
+        blue.turn = 1
+      }
     }
   }
   bright.release = function() {
-    blue.vx -= 10
+    if (iAm === 'blue') {
+      blue.vx -= 10
+    }
   }
 
   let up = keyboard(87)
   up.press = function() {
-    if (red.vy === 0 && red.y === floor) red.vy = -33
+    if (iAm === 'red') {
+      if (red.vy === 0 && red.y === floor) red.vy = -33
+    }
   }
   let bup = keyboard(79)
   bup.press = function() {
-    if (blue.vy === 0 && blue.y === floor) blue.vy = -33
+    if (iAm === 'blue') {
+      if (blue.vy === 0 && blue.y === floor) blue.vy = -33
+    }
   }
 
   let swing = keyboard(67)
   swing.press = function() {
-    if (!red.swing && red.arc === 1) red.swing = true
+    if (iAm === 'red') {
+      if (!red.swing && red.arc === 1) red.swing = true
+    }
   }
   let bswing = keyboard(77)
   bswing.press = function() {
-    if (!blue.swing && blue.arc === 1) blue.swing = true
+    if (iAm === 'blue') {
+      if (!blue.swing && blue.arc === 1) blue.swing = true
+    }
   }
 
   let enter = keyboard(13)
@@ -349,6 +373,10 @@ const main = function () {
   }
 
   //sockets yay
+  socket.on('Player Assignment', (color) => {
+    iAm = color
+    console.log('Playing as', iAm)
+  })
 
   return {}
 }()
