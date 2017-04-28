@@ -25,7 +25,7 @@ const main = function () {
     console.log(`loading ${resource.url}`)
   }
 
-  let state, red, redSword, blue, blueSword, touch, redScore, blueScore, count, gg, redName, blueName, iAm
+  let state, red, redSword, blue, blueSword, touch, redScore, blueScore, count, gg, redName, blueName, iAm, start, ready
 
   const playerHeight = 108
   const floor = 512 - playerHeight
@@ -93,22 +93,30 @@ const main = function () {
     blue.vy = 0
 
     gg = new Container()
-
-    // let blackdrop = new Graphics()
-    // blackdrop.beginFill(0x000000)
-    // blackdrop.drawRect(0, 0, stage.width, stage.height)
-    // blackdrop.endFill()
-    // gg.addChild(blackdrop)
-
     let ggText = new Text(
       'Game over',
       {fontFamily: "Arial", fontSize: 48, fill: "white"}
     )
     ggText.position.set(300, 200)
     gg.addChild(ggText)
-
     stage.addChild(gg)
     gg.visible = false
+
+
+    start = new Container()
+    let blackdrop = new Graphics()
+    blackdrop.beginFill(0x000000)
+    blackdrop.drawRect(0, 0, stage.width, stage.height)
+    blackdrop.endFill()
+    start.addChild(blackdrop)
+    let loadText = new Text(
+      'Waiting for players...',
+      {fontFamily: "Arial", fontSize: 48, fill: "white"}
+    )
+    loadText.position.set(300, 200)
+    start.addChild(loadText)
+    stage.addChild(start)
+
 
     state = play
 
@@ -258,6 +266,10 @@ const main = function () {
 
   }
 
+  function holding() {
+    //
+  }
+
   function score() {
     // console.log(count)
     count--
@@ -369,13 +381,22 @@ const main = function () {
 
   let enter = keyboard(13)
   enter.press = function() {
-    console.log('current stage', stage)
+    // console.log('current stage', stage)
+    if (iAm && start.visible) {
+      socket.emit('ready', iAm)
+    }
   }
 
   //sockets yay
-  socket.on('Player Assignment', (color) => {
+  socket.on('player assignment', (color) => {
     iAm = color
     console.log('Playing as', iAm)
+    state = holding
+  })
+
+  socket.on('start', () => {
+    start.visible = false
+    state = play
   })
 
   return {}
