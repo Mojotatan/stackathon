@@ -40,10 +40,15 @@ io.on('connection', socket => {
       players.ready[iAm] = true
       console.log(iAm, 'player ready')
       if (players.ready.red && players.ready.blue) {
-        socket.emit('start')
-        socket.broadcast.emit('start')
+        // socket.emit('start')
+        // socket.broadcast.emit('start')
+        io.emit('start')
       }
     }
+  })
+
+  socket.on('red move', data => {
+    io.emit('red move', data)
   })
 
   socket.on('disconnect', () => {

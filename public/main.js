@@ -294,17 +294,19 @@ const main = function () {
   let left = keyboard(65)
   left.press = function() {
     if (iAm === 'red') {
-      red.vx -= 10
+      let data = {}
+      data.vx = -10
       if (red.scale.x === 1 * red.vector) {
-        // red.scale.x = -1 * red.vector
-        // red.x += 46 * red.vector
-        red.turn = -1
+        data.turn = -1
       }
+      socket.emit('red move', data)
     }
   }
   left.release = function() {
     if (iAm === 'red') {
-      red.vx += 10
+      let data = {}
+      data.vx = 10
+      socket.emit('red move', data)
     }
   }
   let bleft = keyboard(75)
@@ -325,17 +327,19 @@ const main = function () {
   let right = keyboard(68)
   right.press = function() {
     if (iAm === 'red') {
-      red.vx += 10
+      let data = {}
+      data.vx = 10
       if (red.scale.x === -1 * red.vector) {
-        // red.scale.x = 1 * red.vector
-        // red.x -= 46 * red.vector
-        red.turn = 1
+        data.turn = 1
       }
+      socket.emit('red move', data)
     }
   }
   right.release = function() {
     if (iAm === 'red') {
-      red.vx -= 10
+      let data = {}
+      data.vx = -10
+      socket.emit('red move', data)
     }
   }
   let bright = keyboard(186)
@@ -356,7 +360,11 @@ const main = function () {
   let up = keyboard(87)
   up.press = function() {
     if (iAm === 'red') {
-      if (red.vy === 0 && red.y === floor) red.vy = -33
+      data = {}
+      if (red.vy === 0 && red.y === floor) {
+        data.vy = -33
+        socket.emit('red move', data)
+      }
     }
   }
   let bup = keyboard(79)
@@ -397,6 +405,14 @@ const main = function () {
   socket.on('start', () => {
     start.visible = false
     state = play
+  })
+
+  socket.on('red move', ({vx, vy, turn, swing, arc}) => {
+    if (vx) red.vx += vx
+    if (vy) red.vy += vy
+    if (turn) red.turn = turn
+    if (swing) red.swing = swing
+    if (arc) red.arc = arc
   })
 
   return {}
