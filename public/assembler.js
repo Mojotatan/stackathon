@@ -102,32 +102,14 @@ const assemblePlayer = function(color) {
   let fencer = assembleFencer(color)
   let sword = assembleSword()
 
-  // let arc = new Graphics()
-  // arc.beginFill(0x00FF00)
-  // arc.drawCircle(0, 0, 48)
-  // arc.endFill()
-  // player.addChild(arc)
-
   player.addChild(fencer)
   player.addChild(sword)
   sword.position.set(42, 50)
-  // arc.position.set(42, 50)
-
-  // let polySwing = new Graphics()
-  // polySwing.beginFill(0x00FF00)
-  // polySwing.drawPolygon([
-  //   42, 50,
-  //   42, 0,
-  //   86, 50
-  // ])
-  // polySwing.endFill()
-  // polySwing.alpha = 0
-
-  // player.addChild(polySwing)
 
   player.swing = false
   player.vector = 1
   player.arc = 1
+  player.turn = 0
 
   return player
 }
@@ -196,8 +178,28 @@ const assembleAltFencer = function(color) {
     blade.moveTo(0, 0)
     blade.lineTo(0, -bodyLength)
 
+    function findA (c) {
+      let val = Math.pow(c, 2)
+      val = val / 2
+      return Math.round(Math.sqrt(val))
+    }
+    let blade1 = new Graphics()
+    blade1.lineStyle(2, 0x000000, 1)
+    blade1.moveTo(0, 0)
+    blade1.lineTo(-findA(bodyLength), -findA(bodyLength))
+
+    let blade2 = new Graphics()
+    blade2.lineStyle(2, 0x000000, 1)
+    blade2.moveTo(0, 0)
+    blade2.lineTo(-bodyLength, 0)
+
     sword.addChild(hilt)
     sword.addChild(blade)
+    sword.addChild(blade1)
+    sword.addChild(blade2)
+
+    blade1.visible = false
+    blade2.visible = false
 
     return sword
 
@@ -212,15 +214,11 @@ const assembleAltFencer = function(color) {
     player.addChild(fencer)
     player.addChild(sword)
     sword.position.set(46 - 42, 50)
-    
-    // let polySwing = new Graphics()
-    // polySwing.beginFill(0x00FF00)
-    // polySwing.drawPolygon([
-
-    // ])
 
     player.swing = false
     player.vector = -1
+    player.arc = 1
+    player.turn = 0
 
     return player
   }
