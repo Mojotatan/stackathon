@@ -247,30 +247,27 @@ const main = function () {
     }
     else if (rHit - bHit > 0) {
       // impact('red')
-      socket.emit('impact', 'red')
+      socket.emit('impact', {color: 'red', score: redScore})
     }
     else if (bHit - rHit > 0) {
       // impact('blue')
-      socket.emit('impact', 'blue')
+      socket.emit('impact', {color: 'blue', score: blueScore})
     }
 
   }
 
   function impact(player) {
-    let points = 0
     if (player) {
       if (player === 'red') {
         redScore++
-        points = redScore
         redName.text = `Red ${redScore}`
       } else {
         blueScore++
-        points = blueScore
         blueName.text = `${blueScore} Blue`
       }
     }
-    if (points >= 5) {
-      gg.children[0].text = `Game Over \n${player} wins`
+    if (redScore >= 5 || blueScore >= 5) {
+      gg.children[0].text = `Game Over ${player} wins`
       state = end
     } else {
       count = 60
@@ -438,8 +435,8 @@ const main = function () {
     if (swing) blue.swing = swing
   })
 
-  socket.on('impact', (color) => {
-    impact(color)
+  socket.on('impact', (data) => {
+    impact(data.color)
   })
 
   return {}
