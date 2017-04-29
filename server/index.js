@@ -48,12 +48,23 @@ io.on('connection', socket => {
   })
 
   socket.on('red move', data => {
+    console.log('red')
     io.emit('red move', data)
   })
 
+  socket.on('blue move', data => {
+    io.emit('blue move', data)
+  })
+
   socket.on('disconnect', () => {
-    if (players.red === socket.id) players.red = null
-    else if (players.blue === socket.id) players.blue = null
+    if (players.red === socket.id) {
+      players.red = null
+      players.ready.red = false
+    }
+    else if (players.blue === socket.id) {
+      players.blue = null
+      players.ready.blue = false
+    }
     console.log('A user has disconnected @', socket.id)
   })
 })

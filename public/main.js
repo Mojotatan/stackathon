@@ -110,11 +110,17 @@ const main = function () {
     blackdrop.endFill()
     start.addChild(blackdrop)
     let loadText = new Text(
-      'Waiting for players...',
+      'ULTRA FENCING\nWaiting for players to join...',
       {fontFamily: "Arial", fontSize: 48, fill: "white"}
     )
-    loadText.position.set(300, 200)
+    loadText.position.set(200, 100)
+    let loadInstructions = new Text(
+      'Move around with the arrows\nJump with the up arrow\nAttack with spacebar\nPress enter to ready up',
+      {fontFamily: "Arial", fontSize: 32, fill: "white", align: "center"}
+    )
+    loadInstructions.position.set(200, 250)
     start.addChild(loadText)
+    start.addChild(loadInstructions)
     stage.addChild(start)
 
 
@@ -291,7 +297,7 @@ const main = function () {
   //up38 left37 down40 right39
   //space32 c67 m77
 
-  let left = keyboard(65)
+  let left = keyboard(37)
   left.press = function() {
     if (iAm === 'red') {
       let data = {}
@@ -301,6 +307,14 @@ const main = function () {
       }
       socket.emit('red move', data)
     }
+    if (iAm === 'blue') {
+      let data = {}
+      data.vx = -10
+      if (blue.scale.x === 1 * blue.vector) {
+        data.turn = -1
+      }
+      socket.emit('blue move', data)
+    }
   }
   left.release = function() {
     if (iAm === 'red') {
@@ -308,23 +322,14 @@ const main = function () {
       data.vx = 10
       socket.emit('red move', data)
     }
-  }
-  let bleft = keyboard(75)
-  bleft.press = function() {
     if (iAm === 'blue') {
-      blue.vx -= 10
-      if (blue.scale.x === 1 * blue.vector) {
-        blue.turn = -1
-      }
-    }
-  }
-  bleft.release = function() {
-    if (iAm === 'blue') {
-      blue.vx += 10
+      let data = {}
+      data.vx = 10
+      socket.emit('blue move', data)
     }
   }
 
-  let right = keyboard(68)
+  let right = keyboard(39)
   right.press = function() {
     if (iAm === 'red') {
       let data = {}
@@ -334,6 +339,14 @@ const main = function () {
       }
       socket.emit('red move', data)
     }
+    if (iAm === 'blue') {
+      let data = {}
+      data.vx = 10
+      if (blue.scale.x === -1 * blue.vector) {
+        data.turn = 1
+      }
+      socket.emit('blue move', data)
+    }
   }
   right.release = function() {
     if (iAm === 'red') {
@@ -341,49 +354,46 @@ const main = function () {
       data.vx = -10
       socket.emit('red move', data)
     }
-  }
-  let bright = keyboard(186)
-  bright.press = function() {
     if (iAm === 'blue') {
-      blue.vx += 10
-      if (blue.scale.x === -1 * blue.vector) {
-        blue.turn = 1
-      }
-    }
-  }
-  bright.release = function() {
-    if (iAm === 'blue') {
-      blue.vx -= 10
+      let data = {}
+      data.vx = -10
+      socket.emit('blue move', data)
     }
   }
 
-  let up = keyboard(87)
+  let up = keyboard(38)
   up.press = function() {
     if (iAm === 'red') {
-      data = {}
+      let data = {}
       if (red.vy === 0 && red.y === floor) {
         data.vy = -33
         socket.emit('red move', data)
       }
     }
-  }
-  let bup = keyboard(79)
-  bup.press = function() {
     if (iAm === 'blue') {
-      if (blue.vy === 0 && blue.y === floor) blue.vy = -33
+      let data = {}
+      if (blue.vy === 0 && blue.y === floor) {
+        data.vy = -33
+        socket.emit('blue move', data)
+      }
     }
   }
 
-  let swing = keyboard(67)
+  let swing = keyboard(32)
   swing.press = function() {
     if (iAm === 'red') {
-      if (!red.swing && red.arc === 1) red.swing = true
+      let data = {}
+      if (!red.swing && red.arc === 1) {
+        data.swing = true
+        socket.emit('red move', data)
+      }
     }
-  }
-  let bswing = keyboard(77)
-  bswing.press = function() {
     if (iAm === 'blue') {
-      if (!blue.swing && blue.arc === 1) blue.swing = true
+      let data = {}
+      if (!blue.swing && blue.arc === 1) {
+        data.swing = true
+        socket.emit('blue move', data)
+      }
     }
   }
 
@@ -407,12 +417,18 @@ const main = function () {
     state = play
   })
 
-  socket.on('red move', ({vx, vy, turn, swing, arc}) => {
+  socket.on('red move', ({vx, vy, turn, swing}) => {
     if (vx) red.vx += vx
     if (vy) red.vy += vy
     if (turn) red.turn = turn
     if (swing) red.swing = swing
-    if (arc) red.arc = arc
+  })
+
+  socket.on('blue move', ({vx, vy, turn, swing}) => {
+    if (vx) blue.vx += vx
+    if (vy) blue.vy += vy
+    if (turn) blue.turn = turn
+    if (swing) blue.swing = swing
   })
 
   return {}
