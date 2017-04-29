@@ -203,29 +203,6 @@ const main = function () {
       blueSword.children[blue.arc].visible = true
     }
 
-    function impact(player) {
-      let points = 0
-      if (player) {
-        if (player === 'red') {
-          redScore++
-          points = redScore
-          redName.text = `Red ${redScore}`
-        } else {
-          blueScore++
-          points = blueScore
-          blueName.text = `${blueScore} Blue`
-        }
-      }
-      if (points >= 5) {
-        gg.children[0].text = `Game Over \n${player} wins`
-        state = end
-      } else {
-        count = 60
-        touch.visible = true
-        state = score
-      }
-    }
-
     // a note on collision: right now, when both models are facing forward, it works perfectly.
     // however, when you face backwards, the collision still triggers on your sword swinging "backwards"
     let rHit = false
@@ -268,9 +245,38 @@ const main = function () {
     if (rHit && bHit) {
       console.log('*kachink*')
     }
-    if (rHit && !bHit) impact('red')
-    if (!rHit && bHit) impact('blue')
+    else if (rHit && !bHit) {
+      // impact('red')
+      socket.emit('impact', 'red')
+    }
+    else if (!rHit && bHit) {
+      // impact('blue')
+      socket.emit('impact', 'blue')
+    }
 
+  }
+
+  function impact(player) {
+    let points = 0
+    if (player) {
+      if (player === 'red') {
+        redScore++
+        points = redScore
+        redName.text = `Red ${redScore}`
+      } else {
+        blueScore++
+        points = blueScore
+        blueName.text = `${blueScore} Blue`
+      }
+    }
+    if (points >= 5) {
+      gg.children[0].text = `Game Over \n${player} wins`
+      state = end
+    } else {
+      count = 60
+      touch.visible = true
+      state = score
+    }
   }
 
   function holding() {
@@ -430,6 +436,10 @@ const main = function () {
     if (vy) blue.vy += vy
     if (turn) blue.turn = turn
     if (swing) blue.swing = swing
+  })
+
+  socket.on('impact', (color) => {
+    impact(color)
   })
 
   return {}

@@ -48,12 +48,15 @@ io.on('connection', socket => {
   })
 
   socket.on('red move', data => {
-    console.log('red')
     io.emit('red move', data)
   })
 
   socket.on('blue move', data => {
     io.emit('blue move', data)
+  })
+
+  socket.on('impact', color => {
+    io.emit('impact', color)
   })
 
   socket.on('disconnect', () => {
