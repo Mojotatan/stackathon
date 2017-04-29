@@ -205,27 +205,27 @@ const main = function () {
 
     // a note on collision: right now, when both models are facing forward, it works perfectly.
     // however, when you face backwards, the collision still triggers on your sword swinging "backwards"
-    let rHit = false
-    let bHit = false
+    let rHit = 0
+    let bHit = 0
 
     if (b.hit(redSword.children[red.arc], blue, false, false, true) && red.arc > 1) {
       // console.log('red sword hit')
-      rHit = true
+      rHit++
     }
 
     if (b.hit(blueSword.children[blue.arc], red, false, false, true) && blue.arc > 1) {
       // console.log('blue sword hit')
-      bHit = true
+      bHit++
     }
 
-    if (b.hit(red, blue.children[0].children[0], false, false, true) && red.y < floor) {
+    if ((b.hit(red.children[0].children[4], blue.children[0].children[0], false, false, true) || b.hit(red.children[0].children[5], blue.children[0].children[0], false, false, true)) && red.y < floor) {
       // console.log('red toe touch')
-      rHit = true
+      rHit++
     }
 
-    if (b.hit(blue, red.children[0].children[0], false, false, true) && blue.y < floor) {
+    if ((b.hit(blue.children[0].children[4], red.children[0].children[0], false, false, true) || b.hit(blue.children[0].children[5], red.children[0].children[0], false, false, true)) && blue.y < floor) {
       // console.log('blue toe touch')
-      bHit = true
+      bHit++
     }
 
     // let toeTouch = b.hit(red.children[0], blue.children[0], true, false, true)
@@ -242,14 +242,14 @@ const main = function () {
     //   }
     // }
 
-    if (rHit && bHit) {
+    if (rHit === bHit && rHit > 0) {
       console.log('*kachink*')
     }
-    else if (rHit && !bHit) {
+    else if (rHit - bHit > 0) {
       // impact('red')
       socket.emit('impact', 'red')
     }
-    else if (!rHit && bHit) {
+    else if (bHit - rHit > 0) {
       // impact('blue')
       socket.emit('impact', 'blue')
     }
