@@ -17,7 +17,7 @@ const main = function () {
   document.body.appendChild(renderer.view)
 
   loader
-    .add(["sprites/morguethrull.png", "sprites/fullstack.png", "sprites/david.png", "sprites/nimit.png"])
+    .add(["maps/city.png", "maps/swamp.png", "maps/stonehenge.png", "sprites/david.png", "sprites/nimit.png"])
     .on('progress', loadProgressHandler)
     .load(setup);
 
@@ -33,9 +33,10 @@ const main = function () {
   function setup() {
     console.log('All files loaded')
 
-    let backdrop = new Sprite(resources["sprites/fullstack.png"].texture)
+    let maps = ["maps/city.png", "maps/swamp.png", "maps/stonehenge.png"]
+
+    let backdrop = new Sprite(resources[maps[Math.floor(Math.random() * 3)]].texture)
     stage.addChild(backdrop)
-    backdrop.position.set(0, -100)
 
     let redAvatar = new Sprite(resources["sprites/david.png"].texture)
     redAvatar.scale.set(.25, .25)

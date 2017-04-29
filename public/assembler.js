@@ -62,7 +62,7 @@ const assembleSword = function() {
   hilt.endFill()
 
   let blade = new Graphics()
-  blade.lineStyle(2, 0x000000, 1)
+  blade.lineStyle(2, 0x808080, 1)
   blade.moveTo(0, 0)
   blade.lineTo(0, -bodyLength)
 
@@ -74,12 +74,12 @@ const assembleSword = function() {
     return Math.round(Math.sqrt(val))
   }
   let blade1 = new Graphics()
-  blade1.lineStyle(2, 0x000000, 1)
+  blade1.lineStyle(2, 0x808080, 1)
   blade1.moveTo(0, 0)
   blade1.lineTo(findA(bodyLength), -findA(bodyLength))
 
   let blade2 = new Graphics()
-  blade2.lineStyle(2, 0x000000, 1)
+  blade2.lineStyle(2, 0x808080, 1)
   blade2.moveTo(0, 0)
   blade2.lineTo(bodyLength, 0)
 
@@ -174,7 +174,7 @@ const assembleAltFencer = function(color) {
     hilt.endFill()
 
     let blade = new Graphics()
-    blade.lineStyle(2, 0x000000, 1)
+    blade.lineStyle(2, 0x808080, 1)
     blade.moveTo(0, 0)
     blade.lineTo(0, -bodyLength)
 
@@ -184,12 +184,12 @@ const assembleAltFencer = function(color) {
       return Math.round(Math.sqrt(val))
     }
     let blade1 = new Graphics()
-    blade1.lineStyle(2, 0x000000, 1)
+    blade1.lineStyle(2, 0x808080, 1)
     blade1.moveTo(0, 0)
     blade1.lineTo(-findA(bodyLength), -findA(bodyLength))
 
     let blade2 = new Graphics()
-    blade2.lineStyle(2, 0x000000, 1)
+    blade2.lineStyle(2, 0x808080, 1)
     blade2.moveTo(0, 0)
     blade2.lineTo(-bodyLength, 0)
 
