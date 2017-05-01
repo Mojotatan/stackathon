@@ -111,7 +111,7 @@ const main = function () {
     blackdrop.endFill()
     start.addChild(blackdrop)
     let loadText = new Text(
-      'ULTRA FENCING\nWaiting for players to join...',
+      'SUPER FENCING SIMULATOR\nWaiting for players to join...',
       {fontFamily: "Arial", fontSize: 48, fill: "white"}
     )
     loadText.position.set(200, 100)
