@@ -52,6 +52,14 @@ io.on('connection', socket => {
     }
   })
 
+  socket.on('avatar', avatar => {
+    if (players.red === socket.id) {
+      io.emit('avatar', {avatar, color: 'red'})
+    } else if (players.blue === socket.id) {
+      io.emit('avatar', {avatar, color: 'blue'})
+    }
+  })
+
   socket.on('red move', data => {
     io.emit('red move', data)
   })
@@ -71,11 +79,13 @@ io.on('connection', socket => {
 
   socket.on('disconnect', () => {
     if (players.red === socket.id) {
+      console.log('player left red')
       players.red = null
       players.ready.red = false
       players.score.red = 0
     }
     else if (players.blue === socket.id) {
+      console.log('player left blue')
       players.blue = null
       players.ready.blue = false
       players.score.blue = 0

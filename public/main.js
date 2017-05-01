@@ -1,4 +1,4 @@
-const main = function () {
+const main = function() {
   // aliases
   const Container = PIXI.Container,
     autoDetectRenderer = PIXI.autoDetectRenderer,
@@ -9,8 +9,7 @@ const main = function () {
     Graphics = PIXI.Graphics,
     Text = PIXI.Text,
     Matrix = PIXI.Matrix,
-    b = new Bump(PIXI),
-    socket = io(window.location.origin)
+    b = new Bump(PIXI)
 
   // set up web-gl
   let stage = new Container()
@@ -19,7 +18,10 @@ const main = function () {
 
   // load sprites
   loader
-    .add(["maps/city.png", "maps/swamp.png", "maps/stonehenge.png", "avatars/david.png", "avatars/nimit.png"])
+    .add(["/maps/city.png", "/maps/swamp.png", "/maps/stonehenge.png",
+    "/avatars/david.png", "/avatars/nimit.png", "/avatars/zagunis.png",
+    "/avatars/morguethrull.png", "/avatars/cody.png", "/avatars/he-man.png",
+    "/avatars/PogChamp.png", "/avatars/duane.png", "/avatars/morgan-freeman.png"])
     .on('progress', loadProgressHandler)
     .load(setup);
 
@@ -28,25 +30,19 @@ const main = function () {
   }
 
   // define 'global' variables
-  let state, red, redSword, blue, blueSword, touch, redScore, blueScore, count, gg, redName, blueName, iAm, start, ready
+  let state, red, redSword, blue, blueSword, touch, redScore, blueScore, count, gg, redName, blueName, iAm, start, ready, redAvatar, blueAvatar
   const playerHeight = 108
   const floor = 512 - playerHeight
 
   function setup() {
     console.log('All files loaded')
 
-    // load a random map
-    // let maps = ["maps/city.png", "maps/swamp.png", "maps/stonehenge.png"]
-    // let backdrop = new Sprite(resources[maps[Math.floor(Math.random() * 3)]].texture)
-    // stage.addChild(backdrop)
-
-    let redAvatar = new Sprite(resources["avatars/david.png"].texture)
+    // default avatars
+    redAvatar = new Sprite(resources["/avatars/david.png"].texture)
     redAvatar.scale.set(.25, .25)
-    // redAvatar.width = 125
-    // redAvatar.height = 125
     stage.addChild(redAvatar)
 
-    let blueAvatar = new Sprite(resources["avatars/nimit.png"].texture)
+    blueAvatar = new Sprite(resources["/avatars/david.png"].texture)
     blueAvatar.scale.set(.25, .25)
     stage.addChild(blueAvatar)
     blueAvatar.position.set(899, 0)
@@ -374,7 +370,7 @@ const main = function () {
 
   let enter = keyboard(13)
   enter.press = function() {
-    console.log(stage)
+    console.log(stage.children)
     if (iAm && start.visible) {
       socket.emit('ready', iAm)
     }
@@ -388,7 +384,7 @@ const main = function () {
   })
 
   socket.on('start', (map) => {
-    let maps = ["maps/city.png", "maps/swamp.png", "maps/stonehenge.png"]
+    let maps = ["/maps/city.png", "/maps/swamp.png", "/maps/stonehenge.png"]
     let backdrop = new Sprite(resources[maps[map]].texture)
     stage.addChildAt(backdrop, 0)
     start.visible = false
@@ -413,8 +409,22 @@ const main = function () {
     impact(data.color)
   })
 
-  // avatar selection
-  
+  socket.on('avatar', data => {
+    if (data.color === 'red') {
+      stage.removeChild(redAvatar)
+      redAvatar = new Sprite(resources[data.avatar].texture)
+      redAvatar.width = 125
+      redAvatar.height = 125
+      stage.addChildAt(redAvatar, 1)
+    } else if (data.color === 'blue') {
+      stage.removeChild(blueAvatar)
+      blueAvatar = new Sprite(resources[data.avatar].texture)
+      blueAvatar.width = 125
+      blueAvatar.height = 125
+      stage.addChildAt(blueAvatar, 2)
+      blueAvatar.position.set(899, 0)
+    }
+  })
 
   return {}
 }()

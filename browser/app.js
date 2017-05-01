@@ -4,8 +4,6 @@ import {Provider} from 'react-redux'
 import {BrowserRouter, Route} from 'react-router-dom'
 import store from './redux/store'
 
-// const socket = io(window.location.origin)
-
 import Avatar from './containers/avatar'
 
 ReactDOM.render(

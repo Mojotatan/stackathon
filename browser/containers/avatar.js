@@ -1,11 +1,19 @@
 import React from 'react'
 
+let show = true
+socket.on('start', () => {
+  console.log('TEST')
+  show = false
+})
+
 class Avatar extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = {
-      images: ['/avatars/david.png', '/avatars/nimit.png', '/avatars/morguethrull.png', '/avatars/morgan-freeman.png'],
-      focus: '',
+      images: ["/avatars/david.png", "/avatars/nimit.png", "/avatars/zagunis.png",
+    "/avatars/morguethrull.png", "/avatars/cody.png", "/avatars/he-man.png",
+    "/avatars/PogChamp.png", "/avatars/duane.png", "/avatars/morgan-freeman.png"],
+      focus: '/avatars/david.png',
       input: ''
     }
 
@@ -15,17 +23,15 @@ class Avatar extends React.Component {
   }
 
   handleChange(e) {
-    console.log('changed')
     this.setState({input: e.target.value})
   }
 
   handleClick(e) {
-    console.log('clicked')
-    this.setState({focus: e.target.key})
+    this.setState({focus: e})
+    socket.emit('avatar', e)
   }
 
   handleSubmit(e) {
-    console.log('submitted')
     this.setState({
       images: [...this.state.images, this.state.input],
       input: '',
@@ -34,16 +40,22 @@ class Avatar extends React.Component {
 
   render() {
     return(
-      <p><strong>CHOOSE AN AVATAR</strong> Enter your own image:
-        <input type="text" value={this.state.input} name="url" onChange={this.handleChange}></input>
-        <button onClick={this.handleSubmit}>Submit</button>
-        <br />
-        {this.state.images.map(image => {
-          return (
-            <img key={image} onClick={this.handleClick} src={image} className={image === focus ? "focus" : ""}></img>
-          )
-        })}
-      </p>
+      <div>
+        {show === true ?
+        <p><strong>CHOOSE AN AVATAR</strong>{/* Enter your own image:
+          <input type="text" placeholder="url" onChange={this.handleChange}></input>
+          <button onClick={this.handleSubmit}>Submit</button>*/}
+          <br />
+          {this.state.images.map(image => {
+            return (
+              <span key={image} onClick={(e) => {this.handleClick(image)}}>
+                <img src={image} className={image === this.state.focus ? "focus" : ""}></img>
+              </span>
+            )
+          })}
+        </p>
+        : null}
+      </div>
     )
   }
 }
