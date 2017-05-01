@@ -25,7 +25,7 @@ const main = function () {
     console.log(`loading ${resource.url}`)
   }
 
-  let state, red, redSword, blue, blueSword, touch, redScore, blueScore, count, gg, redName, blueName
+  let state, red, redSword, blue, blueSword, touch, redScore, blueScore, count, gg, redName, blueName, iAm, start, ready
 
   const playerHeight = 108
   const floor = 512 - playerHeight
@@ -94,22 +94,36 @@ const main = function () {
     blue.vy = 0
 
     gg = new Container()
-
-    // let blackdrop = new Graphics()
-    // blackdrop.beginFill(0x000000)
-    // blackdrop.drawRect(0, 0, stage.width, stage.height)
-    // blackdrop.endFill()
-    // gg.addChild(blackdrop)
-
     let ggText = new Text(
       'Game over',
       {fontFamily: "Arial", fontSize: 48, fill: "white"}
     )
     ggText.position.set(300, 200)
     gg.addChild(ggText)
-
     stage.addChild(gg)
     gg.visible = false
+
+
+    start = new Container()
+    let blackdrop = new Graphics()
+    blackdrop.beginFill(0x000000)
+    blackdrop.drawRect(0, 0, stage.width, stage.height)
+    blackdrop.endFill()
+    start.addChild(blackdrop)
+    let loadText = new Text(
+      'SUPER FENCING SIMULATOR\nWaiting for players to join...',
+      {fontFamily: "Arial", fontSize: 48, fill: "white"}
+    )
+    loadText.position.set(200, 100)
+    let loadInstructions = new Text(
+      'Move around with the arrows\nJump with the up arrow\nAttack with spacebar\nPress enter to ready up',
+      {fontFamily: "Arial", fontSize: 32, fill: "white", align: "center"}
+    )
+    loadInstructions.position.set(200, 250)
+    start.addChild(loadText)
+    start.addChild(loadInstructions)
+    stage.addChild(start)
+
 
     state = play
 
@@ -189,29 +203,6 @@ const main = function () {
       blueSword.children[blue.arc].visible = true
     }
 
-    function impact(player) {
-      let points = 0
-      if (player) {
-        if (player === 'red') {
-          redScore++
-          points = redScore
-          redName.text = `Red ${redScore}`
-        } else {
-          blueScore++
-          points = blueScore
-          blueName.text = `${blueScore} Blue`
-        }
-      }
-      if (points >= 5) {
-        gg.children[0].text = `Game Over \n${player} wins`
-        state = end
-      } else {
-        count = 60
-        touch.visible = true
-        state = score
-      }
-    }
-
     // a note on collision: right now, when both models are facing forward, it works perfectly.
     // however, when you face backwards, the collision still triggers on your sword swinging "backwards"
     let rHit = 0
@@ -254,9 +245,39 @@ const main = function () {
     if (rHit === bHit && rHit > 0) {
       console.log('*kachink*')
     }
-    else if (rHit - bHit > 0) impact('red')
-    else if (bHit - rHit > 0) impact('blue')
+    else if (rHit - bHit > 0) {
+      // impact('red')
+      socket.emit('impact', {color: 'red', score: redScore})
+    }
+    else if (bHit - rHit > 0) {
+      // impact('blue')
+      socket.emit('impact', {color: 'blue', score: blueScore})
+    }
 
+  }
+
+  function impact(player) {
+    if (player) {
+      if (player === 'red') {
+        redScore++
+        redName.text = `Red ${redScore}`
+      } else {
+        blueScore++
+        blueName.text = `${blueScore} Blue`
+      }
+    }
+    if (redScore >= 5 || blueScore >= 5) {
+      gg.children[0].text = `Game Over ${player} wins`
+      state = end
+    } else {
+      count = 60
+      touch.visible = true
+      state = score
+    }
+  }
+
+  function holding() {
+    //
   }
 
   function score() {
@@ -280,76 +301,143 @@ const main = function () {
   //up38 left37 down40 right39
   //space32 c67 m77
 
-  let left = keyboard(65)
+  let left = keyboard(37)
   left.press = function() {
-    red.vx -= 10
-    if (red.scale.x === 1 * red.vector) {
-      // red.scale.x = -1 * red.vector
-      // red.x += 46 * red.vector
-      red.turn = -1
+    if (iAm === 'red') {
+      let data = {}
+      data.vx = -10
+      if (red.scale.x === 1 * red.vector) {
+        data.turn = -1
+      }
+      socket.emit('red move', data)
+    }
+    if (iAm === 'blue') {
+      let data = {}
+      data.vx = -10
+      if (blue.scale.x === 1 * blue.vector) {
+        data.turn = -1
+      }
+      socket.emit('blue move', data)
     }
   }
   left.release = function() {
-    red.vx += 10
-  }
-  let bleft = keyboard(75)
-  bleft.press = function() {
-    blue.vx -= 10
-    if (blue.scale.x === 1 * blue.vector) {
-      blue.turn = -1
+    if (iAm === 'red') {
+      let data = {}
+      data.vx = 10
+      socket.emit('red move', data)
+    }
+    if (iAm === 'blue') {
+      let data = {}
+      data.vx = 10
+      socket.emit('blue move', data)
     }
   }
-  bleft.release = function() {
-    blue.vx += 10
-  }
 
-  let right = keyboard(68)
+  let right = keyboard(39)
   right.press = function() {
-    red.vx += 10
-    if (red.scale.x === -1 * red.vector) {
-      // red.scale.x = 1 * red.vector
-      // red.x -= 46 * red.vector
-      red.turn = 1
+    if (iAm === 'red') {
+      let data = {}
+      data.vx = 10
+      if (red.scale.x === -1 * red.vector) {
+        data.turn = 1
+      }
+      socket.emit('red move', data)
+    }
+    if (iAm === 'blue') {
+      let data = {}
+      data.vx = 10
+      if (blue.scale.x === -1 * blue.vector) {
+        data.turn = 1
+      }
+      socket.emit('blue move', data)
     }
   }
   right.release = function() {
-    red.vx -= 10
-  }
-  let bright = keyboard(186)
-  bright.press = function() {
-    blue.vx += 10
-    if (blue.scale.x === -1 * blue.vector) {
-      blue.turn = 1
+    if (iAm === 'red') {
+      let data = {}
+      data.vx = -10
+      socket.emit('red move', data)
+    }
+    if (iAm === 'blue') {
+      let data = {}
+      data.vx = -10
+      socket.emit('blue move', data)
     }
   }
-  bright.release = function() {
-    blue.vx -= 10
-  }
 
-  let up = keyboard(87)
+  let up = keyboard(38)
   up.press = function() {
-    if (red.vy === 0 && red.y === floor) red.vy = -33
-  }
-  let bup = keyboard(79)
-  bup.press = function() {
-    if (blue.vy === 0 && blue.y === floor) blue.vy = -33
+    if (iAm === 'red') {
+      let data = {}
+      if (red.vy === 0 && red.y === floor) {
+        data.vy = -33
+        socket.emit('red move', data)
+      }
+    }
+    if (iAm === 'blue') {
+      let data = {}
+      if (blue.vy === 0 && blue.y === floor) {
+        data.vy = -33
+        socket.emit('blue move', data)
+      }
+    }
   }
 
-  let swing = keyboard(67)
+  let swing = keyboard(32)
   swing.press = function() {
-    if (!red.swing && red.arc === 1) red.swing = true
-  }
-  let bswing = keyboard(77)
-  bswing.press = function() {
-    if (!blue.swing && blue.arc === 1) blue.swing = true
+    if (iAm === 'red') {
+      let data = {}
+      if (!red.swing && red.arc === 1) {
+        data.swing = true
+        socket.emit('red move', data)
+      }
+    }
+    if (iAm === 'blue') {
+      let data = {}
+      if (!blue.swing && blue.arc === 1) {
+        data.swing = true
+        socket.emit('blue move', data)
+      }
+    }
   }
 
   let enter = keyboard(13)
   enter.press = function() {
-    console.log('current stage', stage)
+    // console.log('current stage', stage)
+    if (iAm && start.visible) {
+      socket.emit('ready', iAm)
+    }
   }
 
   //sockets yay
+  socket.on('player assignment', (color) => {
+    iAm = color
+    console.log('Playing as', iAm)
+    state = holding
+  })
+
+  socket.on('start', () => {
+    start.visible = false
+    state = play
+  })
+
+  socket.on('red move', ({vx, vy, turn, swing}) => {
+    if (vx) red.vx += vx
+    if (vy) red.vy += vy
+    if (turn) red.turn = turn
+    if (swing) red.swing = swing
+  })
+
+  socket.on('blue move', ({vx, vy, turn, swing}) => {
+    if (vx) blue.vx += vx
+    if (vy) blue.vy += vy
+    if (turn) blue.turn = turn
+    if (swing) blue.swing = swing
+  })
+
+  socket.on('impact', (data) => {
+    impact(data.color)
+  })
 
   return {}
 }()
