@@ -1,4 +1,5 @@
 const main = function () {
+  // aliases
   const Container = PIXI.Container,
     autoDetectRenderer = PIXI.autoDetectRenderer,
     loader = PIXI.loader,
@@ -11,13 +12,14 @@ const main = function () {
     b = new Bump(PIXI),
     socket = io(window.location.origin)
 
+  // set up web-gl
   let stage = new Container()
   const renderer = autoDetectRenderer(1024, 512, {antialias: false, transparent: false, resolution: 1})
-
   document.body.appendChild(renderer.view)
 
+  // load sprites
   loader
-    .add(["maps/city.png", "maps/swamp.png", "maps/stonehenge.png", "sprites/david.png", "sprites/nimit.png"])
+    .add(["maps/city.png", "maps/swamp.png", "maps/stonehenge.png", "avatars/david.png", "avatars/nimit.png"])
     .on('progress', loadProgressHandler)
     .load(setup);
 
@@ -25,24 +27,26 @@ const main = function () {
     console.log(`loading ${resource.url}`)
   }
 
+  // define 'global' variables
   let state, red, redSword, blue, blueSword, touch, redScore, blueScore, count, gg, redName, blueName, iAm, start, ready
-
   const playerHeight = 108
   const floor = 512 - playerHeight
 
   function setup() {
     console.log('All files loaded')
 
-    let maps = ["maps/city.png", "maps/swamp.png", "maps/stonehenge.png"]
+    // load a random map
+    // let maps = ["maps/city.png", "maps/swamp.png", "maps/stonehenge.png"]
+    // let backdrop = new Sprite(resources[maps[Math.floor(Math.random() * 3)]].texture)
+    // stage.addChild(backdrop)
 
-    let backdrop = new Sprite(resources[maps[Math.floor(Math.random() * 3)]].texture)
-    stage.addChild(backdrop)
-
-    let redAvatar = new Sprite(resources["sprites/david.png"].texture)
+    let redAvatar = new Sprite(resources["avatars/david.png"].texture)
     redAvatar.scale.set(.25, .25)
+    // redAvatar.width = 125
+    // redAvatar.height = 125
     stage.addChild(redAvatar)
 
-    let blueAvatar = new Sprite(resources["sprites/nimit.png"].texture)
+    let blueAvatar = new Sprite(resources["avatars/nimit.png"].texture)
     blueAvatar.scale.set(.25, .25)
     stage.addChild(blueAvatar)
     blueAvatar.position.set(899, 0)
@@ -74,12 +78,6 @@ const main = function () {
 
     red = assemblePlayer(0xFF0000, 1)
     redSword = red.children[1]
-
-    // let circle = new Graphics()
-    // circle.beginFill(0xFFFFFF)
-    // circle.drawCircle(500, 420, 1)
-    // circle.endFill()
-    // stage.addChild(circle)
 
     stage.addChild(red)
     red.position.set(80, floor)
@@ -140,6 +138,10 @@ const main = function () {
     renderer.render(stage) //rendering
   }
 
+  function holding() {
+    //this is so nothing happens while the game is waiting for both players to ready up
+  }
+
   function play() {
     red.x += red.vx
     red.y += red.vy
@@ -177,10 +179,6 @@ const main = function () {
       blue.turn = 0
     }
 
-    // if (red.swing) redSword.rotation += .524 * red.vector
-    // else if (!red.swing && Math.abs(redSword.rotation) > 0) redSword.rotation -= .524 * red.vector
-    // if (Math.abs(redSword.rotation) >= 1.5) red.swing = false
-
     if (red.swing) {
       redSword.children[red.arc].visible = false
       red.arc++
@@ -208,49 +206,27 @@ const main = function () {
     let rHit = 0
     let bHit = 0
 
+    // sword touches
     if (b.hit(redSword.children[red.arc], blue, false, false, true) && red.arc > 1) {
-      // console.log('red sword hit')
       rHit++
     }
-
     if (b.hit(blueSword.children[blue.arc], red, false, false, true) && blue.arc > 1) {
-      // console.log('blue sword hit')
       bHit++
     }
 
+    // toe touches
     if ((b.hit(red.children[0].children[4], blue.children[0].children[0], false, false, true) || b.hit(red.children[0].children[5], blue.children[0].children[0], false, false, true)) && red.y < floor) {
       // console.log('red toe touch')
       rHit++
     }
-
     if ((b.hit(blue.children[0].children[4], red.children[0].children[0], false, false, true) || b.hit(blue.children[0].children[5], red.children[0].children[0], false, false, true)) && blue.y < floor) {
-      // console.log('blue toe touch')
       bHit++
     }
 
-    // let toeTouch = b.hit(red.children[0], blue.children[0], true, false, true)
-
-    // if (toeTouch) {
-    //   console.log(toeTouch)
-    //   if (toeTouch === 'bottom') {
-    //     console.log('red toe touch')
-    //     rHit = true
-    //   }
-    //   else if (toeTouch === 'top') {
-    //     console.log('blue toe touch')
-    //     bHit = true
-    //   }
-    // }
-
-    if (rHit === bHit && rHit > 0) {
-      console.log('*kachink*')
-    }
-    else if (rHit - bHit > 0) {
-      // impact('red')
+    if (rHit - bHit > 0) {
       socket.emit('impact', {color: 'red', score: redScore})
     }
     else if (bHit - rHit > 0) {
-      // impact('blue')
       socket.emit('impact', {color: 'blue', score: blueScore})
     }
 
@@ -276,12 +252,7 @@ const main = function () {
     }
   }
 
-  function holding() {
-    //
-  }
-
   function score() {
-    // console.log(count)
     count--
     if (count <= 0) {
       red.position.set(80, floor)
@@ -311,7 +282,7 @@ const main = function () {
       }
       socket.emit('red move', data)
     }
-    if (iAm === 'blue') {
+    else if (iAm === 'blue') {
       let data = {}
       data.vx = -10
       if (blue.scale.x === 1 * blue.vector) {
@@ -326,7 +297,7 @@ const main = function () {
       data.vx = 10
       socket.emit('red move', data)
     }
-    if (iAm === 'blue') {
+    else if (iAm === 'blue') {
       let data = {}
       data.vx = 10
       socket.emit('blue move', data)
@@ -343,7 +314,7 @@ const main = function () {
       }
       socket.emit('red move', data)
     }
-    if (iAm === 'blue') {
+    else if (iAm === 'blue') {
       let data = {}
       data.vx = 10
       if (blue.scale.x === -1 * blue.vector) {
@@ -358,7 +329,7 @@ const main = function () {
       data.vx = -10
       socket.emit('red move', data)
     }
-    if (iAm === 'blue') {
+    else if (iAm === 'blue') {
       let data = {}
       data.vx = -10
       socket.emit('blue move', data)
@@ -374,7 +345,7 @@ const main = function () {
         socket.emit('red move', data)
       }
     }
-    if (iAm === 'blue') {
+    else if (iAm === 'blue') {
       let data = {}
       if (blue.vy === 0 && blue.y === floor) {
         data.vy = -33
@@ -392,7 +363,7 @@ const main = function () {
         socket.emit('red move', data)
       }
     }
-    if (iAm === 'blue') {
+    else if (iAm === 'blue') {
       let data = {}
       if (!blue.swing && blue.arc === 1) {
         data.swing = true
@@ -403,7 +374,7 @@ const main = function () {
 
   let enter = keyboard(13)
   enter.press = function() {
-    // console.log('current stage', stage)
+    console.log(stage)
     if (iAm && start.visible) {
       socket.emit('ready', iAm)
     }
@@ -416,7 +387,10 @@ const main = function () {
     state = holding
   })
 
-  socket.on('start', () => {
+  socket.on('start', (map) => {
+    let maps = ["maps/city.png", "maps/swamp.png", "maps/stonehenge.png"]
+    let backdrop = new Sprite(resources[maps[map]].texture)
+    stage.addChildAt(backdrop, 0)
     start.visible = false
     state = play
   })
@@ -438,6 +412,9 @@ const main = function () {
   socket.on('impact', (data) => {
     impact(data.color)
   })
+
+  // avatar selection
+  
 
   return {}
 }()

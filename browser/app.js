@@ -6,12 +6,12 @@ import store from './redux/store'
 
 // const socket = io(window.location.origin)
 
-import Canvas from './components/canvas'
+import Avatar from './containers/avatar'
 
 ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
-      <Route path="/" component={Canvas} />
+      <Route path="/" component={Avatar} />
     </BrowserRouter>
   </Provider>,
   document.getElementById('main')

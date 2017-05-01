@@ -46,7 +46,8 @@ io.on('connection', socket => {
       if (players.ready.red && players.ready.blue) {
         // socket.emit('start')
         // socket.broadcast.emit('start')
-        io.emit('start')
+        let map = Math.floor(Math.random() * 3)
+        io.emit('start', map)
       }
     }
   })
